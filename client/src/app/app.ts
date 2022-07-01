@@ -1,12 +1,20 @@
 /* eslint-disable no-console */
-import { spawn } from "child_process"
+import { ChildProcess, spawn } from "child_process"
+import { createServer } from "http"
+import { join } from "path"
+import { Server } from "socket.io"
 import { AdminUIBridge } from "../adminUIBridge/AdminUIBridge"
-import { AdminUIClient } from "../adminUIClient/AdminUIClient"
 import { ADMIN_GUI_SOCKET_VARIABLE } from "../adminUICommon/const"
-import { VirtualPeer } from "../virtualNetwork/VirtualPeer"
+import { stringifyAddress } from "../comTypes/util"
+import { IDProvider } from "../dependencyInjection/commonServices/IDProvider"
+import { MessageBridge } from "../dependencyInjection/commonServices/MessageBridge"
+import { DIContext } from "../dependencyInjection/DIContext"
 import { VirtualRouter } from "../virtualNetwork/VirtualRouter"
+import { VirtualModemServer } from "../virtualNetworkModem/VirtualModem"
+import express = require("express")
+import open = require("open")
 
-if (!process.env[ADMIN_GUI_SOCKET_VARIABLE]) {
+/* if (!process.env[ADMIN_GUI_SOCKET_VARIABLE]) {
     const root = new VirtualRouter()
     const bridge = new AdminUIBridge({ parent: root.connect() })
 
@@ -62,4 +70,71 @@ if (!process.env[ADMIN_GUI_SOCKET_VARIABLE]) {
         console.error(err)
         process.exit(1)
     })
+} */
+
+const app = express()
+const server = createServer(app)
+const io = new Server(server)
+
+const root = new VirtualRouter()
+const bridge = new AdminUIBridge({ parent: root.connect() })
+
+io.on("connect", socket => {
+    const context = new DIContext()
+    context.provide(IDProvider, () => new IDProvider.Incremental())
+    context.provide(MessageBridge, () => new MessageBridge.Generic(socket))
+    const modem = context.instantiate(() => new VirtualModemServer(root.connect()))
+    context.guard(modem)
+
+    socket.on("disconnect", () => {
+        context.dispose()
+    })
+})
+
+app.use(express.static(join(__dirname, "../../../view/dist"), {
+    fallthrough: true
+}), (req, res) => res.sendFile(join(__dirname, "../../../view/dist/index.html")))
+
+let bind: any = undefined
+
+for (const arg of process.argv) {
+    const portArgument = arg.match(/^--port=(.*)$/)
+    if (portArgument) {
+        bind = portArgument[1]
+        break
+    }
 }
+
+server.listen(bind, () => {
+    const address = "http://" + stringifyAddress(server.address())
+    if (!process.argv.includes("--no-browser")) open(address)
+    else console.log("Listening at " + address)
+})
+
+const shell = process.env.SHELL ?? process.env.COMSPEC
+let shellProc: ChildProcess | null = null
+if (!shell) console.error("Cannot find shell to start")
+else {
+    shellProc = spawn(shell, {
+        env: {
+            ...process.env,
+            [ADMIN_GUI_SOCKET_VARIABLE]: bridge.path
+        },
+        stdio: "inherit",
+        shell: false
+    })
+
+    shellProc.on("exit", () => {
+        bridge.dispose()
+        process.exit(0)
+    })
+}
+
+process.on("uncaughtException", (err) => {
+    if (shellProc) {
+        console.log("Killing shell because of uncaught error", shellProc.pid)
+        shellProc.kill()
+    }
+    console.error(err)
+    process.exit(1)
+})

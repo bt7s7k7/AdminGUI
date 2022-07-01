@@ -1,13 +1,17 @@
 
 # UCPeM generated, write above to not be overwritten
-vue3gui
-remoteUIFrontend
-remoteUICommon
-structSync
+simpleDB
 struct
+structSync
 dependencyInjection
 eventLib
+nodeLogger
+logger
+adminUIClient
+adminUICommon
 virtualNetworkModem
 virtualNetwork
 registry
 comTypes
+remoteUIBackend
+remoteUICommon

@@ -6,6 +6,10 @@ import { MessageBridge } from "../dependencyInjection/commonServices/MessageBrid
 import { DIContext } from "../dependencyInjection/DIContext"
 import { Disposable, DISPOSE } from "../eventLib/Disposable"
 import { EventEmitter } from "../eventLib/EventEmitter"
+import { RemoteUIController } from "../remoteUIBackend/RemoteUIController"
+import { StructSyncServer } from "../structSync/StructSyncServer"
+import { StructSyncSession } from "../structSync/StructSyncSession"
+import { VirtualPeer } from "../virtualNetwork/VirtualPeer"
 import { VirtualModemClient } from "../virtualNetworkModem/VirtualModem"
 import Split = require("stream-split")
 
@@ -20,6 +24,28 @@ export class AdminUIClient extends Disposable {
 
     public connect() {
         return this.modem.connect()
+    }
+
+    public async makeRemoteUI(name: string) {
+        const innerContext = new DIContext()
+        innerContext.provide(IDProvider, () => new IDProvider.Incremental())
+        innerContext.provide(StructSyncServer, "default")
+        const remoteUI = innerContext.instantiate(() => new RemoteUIController().register())
+        const host = await VirtualPeer.make(this.modem.connect(), name)
+        innerContext.guard(host)
+
+        host.enableHost()
+        host.onConnection.add(innerContext, (conn) => {
+            const connContext = new DIContext(innerContext)
+            connContext.provide(MessageBridge, () => new MessageBridge.Generic(conn))
+            connContext.provide(StructSyncSession, "default")
+
+            conn.onEnd.add(connContext, () => {
+                connContext.dispose()
+            })
+        })
+
+        return { remoteUI, context: innerContext }
     }
 
     constructor(
@@ -75,8 +101,11 @@ export class AdminUIClient extends Disposable {
     }
 
     public static connect(path = process.env[ADMIN_GUI_SOCKET_VARIABLE]) {
-        return new Promise<AdminUIClient>((resolve, reject) => {
-            if (!path) return reject(new Error("Cannot find path of the IPC socket / named pipe, should be in " + ADMIN_GUI_SOCKET_VARIABLE + " env variable or provided explicitly"))
+        return new Promise<AdminUIClient | null>((resolve, reject) => {
+            if (!path) {
+                resolve(null)
+                return
+            }
 
             const socket = createConnection(path, () => {
                 socket.off("error", reject)

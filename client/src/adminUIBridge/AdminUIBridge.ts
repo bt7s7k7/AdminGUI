@@ -63,6 +63,8 @@ export class AdminUIBridge extends Disposable {
             context.guard(modem)
 
             const errorHandler = (err: any) => {
+                if (!err) return
+
                 if (err.code == "ECONNRESET") {
                     return
                 }

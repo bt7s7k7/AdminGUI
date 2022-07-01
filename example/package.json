@@ -1,11 +1,11 @@
 {
-    "name": "client",
+    "name": "example",
     "version": "1.0.0",
     "main": "index.js",
     "license": "MIT",
     "dependencies": {
+        "dotenv": "^16.0.1",
         "express": "^4.18.1",
-        "open": "^8.4.0",
         "socket.io": "^4.5.1",
         "source-map-support": "^0.5.19",
         "stream-split": "^1.1.0"
@@ -25,7 +25,7 @@
         "dev": "concurrently --raw --kill-others \"yarn watch\" \"yarn watch-run\"",
         "watch": "tsc --watch --preserveWatchOutput --noEmitOnError",
         "build": "tsc --preserveWatchOutput",
-        "watch-run": "nodemon --delay 1 -x \"node -r source-map-support/register --preserve-symlinks --inspect\" ./build/app/app.js --no-browser",
+        "watch-run": "nodemon --watch build --delay 1 -x \"node -r source-map-support/register --preserve-symlinks --inspect\" ./build/app/app.js",
         "start": "node -r source-map-support/register --preserve-symlinks ./build/app/app.js",
         "get-ucpem": "curl -L https://github.com/bt7s7k7/UCPeM/releases/latest/download/ucpem.js -o node_modules/.bin/ucpem",
         "lint": "eslint ."
