@@ -1,5 +1,5 @@
 import { mdiLinkVariant, mdiMonitor } from "@mdi/js"
-import { defineComponent } from "vue"
+import { defineComponent, watchEffect } from "vue"
 import { Button } from "../vue3gui/Button"
 import { Icon } from "../vue3gui/Icon"
 import { STATE } from "./STATE"
@@ -7,6 +7,8 @@ import { STATE } from "./STATE"
 export const CardListView = (defineComponent({
     name: "CardListView",
     setup(props, ctx) {
+        watchEffect(() => document.title = STATE.cardsList.config.label)
+
         return () => (
             <div class="flex-fill flex center">
                 <div class="w-500 flex column border rounded pt-4 px-8 pb-8 gap-4">

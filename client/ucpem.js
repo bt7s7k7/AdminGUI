@@ -10,7 +10,9 @@ project.prefix("src").res("adminUIClient",
     github("bt7s7k7/RemoteUI").res("remoteUIBackend")
 )
 
-project.prefix("src").res("adminUIBridge")
+project.prefix("src").res("adminUIBridge",
+    project.ref("adminUICommon")
+)
 
 project.prefix("src").res("adminUICommon",
     github("bt7s7k7/Struct").res("structSync"),

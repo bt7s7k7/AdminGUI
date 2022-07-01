@@ -1,0 +1,13 @@
+{
+    "$schema": "https://raw.githubusercontent.com/bt7s7k7/SMWA/master/schema.json",
+    "name": "link-cards",
+    "include": [
+        "./smwa.json",
+        "./.env",
+        "./dist/**/*"
+    ],
+    "scripts": {
+        "start": "node dist/index.js"
+    },
+    "!version": 0
+}
