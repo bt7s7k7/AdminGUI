@@ -1,7 +1,7 @@
 import { mdiAlert, mdiChevronLeft, mdiReload } from "@mdi/js"
 import { io } from "socket.io-client"
 import { computed, defineComponent, reactive, ref, shallowRef, watch } from "vue"
-import { unreachable } from "../comTypes/util"
+import { iteratorNth, unreachable } from "../comTypes/util"
 import { IDProvider } from "../dependencyInjection/commonServices/IDProvider"
 import { MessageBridge } from "../dependencyInjection/commonServices/MessageBridge"
 import { DIContext } from "../dependencyInjection/DIContext"
@@ -146,6 +146,12 @@ export const AdminUIView = (defineComponent({
 
         watch(() => [selectedHandle.value?.remoteUI, selectedHandle.value?.state], ([remoteUI, state]) => {
             if (state == "Ready" && remoteUI == null) location.reload()
+        })
+
+        watch(() => clients.size, () => {
+            if (clients.size > 0 && selected.value == null) {
+                selected.value = iteratorNth(clients.values(), 0).id
+            }
         })
 
         function reload() {
