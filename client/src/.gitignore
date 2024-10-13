@@ -1,12 +1,12 @@
 
 # UCPeM generated, write above to not be overwritten
-structSync
-struct
-dependencyInjection
-eventLib
-virtualNetworkModem
-virtualNetwork
-registry
-comTypes
-remoteUIBackend
-remoteUICommon
+/structSync
+/struct
+/dependencyInjection
+/eventLib
+/virtualNetworkModem
+/virtualNetwork
+/registry
+/comTypes
+/remoteUIBackend
+/remoteUICommon

@@ -1,17 +1,18 @@
 
 # UCPeM generated, write above to not be overwritten
-simpleDB
-struct
-structSync
-dependencyInjection
-eventLib
-nodeLogger
-logger
-adminUIClient
-adminUICommon
-virtualNetworkModem
-virtualNetwork
-registry
-comTypes
-remoteUIBackend
-remoteUICommon
+/simpleDB
+/struct
+/structSync
+/dependencyInjection
+/eventLib
+/nodeLogger
+/logger
+/prettyPrint
+/adminUIClient
+/adminUICommon
+/virtualNetworkModem
+/virtualNetwork
+/registry
+/comTypes
+/remoteUIBackend
+/remoteUICommon

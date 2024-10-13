@@ -1,6 +1,6 @@
-import { cloneArray, makeRandomID } from "../comTypes/util"
+import { cloneArray, makeRandomID, shallowClone } from "../comTypes/util"
 import { Card, CardsListContract, Config } from "../exampleCommon/CardsList"
-import { formEventToMutation, FormRenderer, TableRenderer } from "../remoteUIBackend/FormRenderer"
+import { FormRenderer, TableRenderer, formEventToMutation } from "../remoteUIBackend/FormRenderer"
 import { defineRouteController } from "../remoteUIBackend/RouteController"
 import { UI } from "../remoteUICommon/UIElement"
 import { DATABASE } from "./DATABASE"
@@ -10,7 +10,8 @@ export class CardsListController extends CardsListContract.defineController() {
         const form = ctx.form("form", Config.ref(), () => this.config.serialize())
 
         this.onMutate.add(this, mutation => {
-            mutation = { ...mutation, path: cloneArray(mutation.path) }
+            mutation = shallowClone(mutation)
+            mutation.path = cloneArray(mutation.path)
             mutation.path.shift()
 
             form.update("all", mutation)

@@ -13,11 +13,13 @@ export class Config extends Struct.define("Config", {
     cards: Card.ref().as(Type.map)
 }) { }
 
-Type.defineMigrations(Config.baseType, [
+Config.baseType.defineMigrations([
     {
         version: 1,
         desc: "Added label",
-        migrate: v => (v.label = "", v)
+        migrate(handle, deserializer, overrides) {
+            overrides.set("label", "")
+        },
     }
 ])
 

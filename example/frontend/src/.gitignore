@@ -1,8 +1,8 @@
 
 # UCPeM generated, write above to not be overwritten
-vue3gui
-structSync
-struct
-dependencyInjection
-eventLib
-exampleCommon
+/vue3gui
+/structSync
+/struct
+/dependencyInjection
+/eventLib
+/exampleCommon

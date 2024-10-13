@@ -20,7 +20,7 @@
         "eslint": "^7.20.0",
         "nodemon": "^2.0.12",
         "ts-node-dev": "^1.1.1",
-        "typescript": "^4.1.3"
+        "typescript": "^5.4.5"
     },
     "scripts": {
         "dev": "concurrently --raw --kill-others \"yarn watch\" \"yarn watch-run\"",
